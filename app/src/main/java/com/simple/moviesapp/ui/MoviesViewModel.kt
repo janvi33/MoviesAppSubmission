@@ -114,5 +114,3 @@ class MoviesViewModel @Inject constructor(
         }
     }
 }
-
-
