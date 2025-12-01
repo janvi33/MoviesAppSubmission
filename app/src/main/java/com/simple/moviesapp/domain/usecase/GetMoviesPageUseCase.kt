@@ -14,10 +14,7 @@ class GetMoviesPageUseCase(
         genre: String?,
         from: Int
     ): Flow<List<Movie>> = flow {
-        val movies = withContext(Dispatchers.IO) {
-            repository.getMovies(genre = genre, from = from)
-        }
-        emit(movies)
+        emit(repository.getMovies(genre, from))
     }
 }
 

@@ -11,10 +11,7 @@ class GetGenresUseCase(
     private val repository: MoviesRepository
 ) {
     operator fun invoke(): Flow<List<Genre>> = flow {
-        val genres = withContext(Dispatchers.IO) {
-            repository.getGenres()
-        }
-        emit(genres)
+        emit( repository.getGenres())
     }
 }
 
