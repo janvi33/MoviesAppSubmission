@@ -5,7 +5,7 @@ import com.simple.moviesapp.domain.model.Movie
 import com.simple.moviesapp.domain.repository.MoviesRepository
 import com.simple.moviesapp.domain.usecase.GetGenresUseCase
 import com.simple.moviesapp.domain.usecase.GetMoviesPageUseCase
-import com.simple.moviesapp.ui.MoviesViewModel
+import com.simple.moviesapp.ui.screens.MoviesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -17,7 +17,6 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Test
 

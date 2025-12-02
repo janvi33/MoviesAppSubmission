@@ -1,7 +1,8 @@
-package com.simple.moviesapp.ui
+package com.simple.moviesapp.ui.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -218,7 +219,7 @@ private fun MovieCard(
 
 @Composable
 private fun BoxFullScreenLoading() {
-    androidx.compose.foundation.layout.Box(
+    Box(
         modifier = Modifier
             .fillMaxSize(),
         contentAlignment = Alignment.Center

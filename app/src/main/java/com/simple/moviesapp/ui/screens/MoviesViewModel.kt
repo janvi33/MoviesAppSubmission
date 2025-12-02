@@ -1,4 +1,4 @@
-package com.simple.moviesapp.ui
+package com.simple.moviesapp.ui.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,24 +6,19 @@ import com.simple.moviesapp.domain.model.Genre
 import com.simple.moviesapp.domain.model.Movie
 import com.simple.moviesapp.domain.usecase.GetGenresUseCase
 import com.simple.moviesapp.domain.usecase.GetMoviesPageUseCase
+import com.simple.moviesapp.ui.MoviesUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-data class MoviesUiState(
-    val isLoading: Boolean = false,
-    val error: String? = null,
-    val genres: List<Genre> = emptyList(),
-    val selectedGenre: String? = null,
-    val movies: List<Movie> = emptyList(),
-    val hasMore: Boolean = true,
-    val isLoadingMore: Boolean = false
-)
 
 @HiltViewModel
 class MoviesViewModel @Inject constructor(
@@ -48,37 +43,51 @@ class MoviesViewModel @Inject constructor(
             movies = emptyList(),
             hasMore = true
         )
-        loadJob = viewModelScope.launch {
-            // Load genres
-            getGenres()
-                .catch { t ->
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        error = t.message ?: "Unknown error"
-                    )
+        loadJob = viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Load genres and movies in parallel
+                val genresDeferred = async {
+                    getGenres()
+                        .catch { t ->
+                            _state.value = _state.value.copy(
+                                isLoading = false,
+                                error = t.message ?: "Unknown error"
+                            )
+                            emptyList<Genre>()
+                        }
+                        .first()
                 }
-                .collect { genres ->
-                    _state.value = _state.value.copy(genres = genres)
+                
+                val moviesDeferred = async {
+                    getMoviesPage(
+                        genre = _state.value.selectedGenre,
+                        from = 0
+                    )
+                        .catch { t ->
+                            _state.value = _state.value.copy(
+                                isLoading = false,
+                                error = t.message ?: "Unknown error"
+                            )
+                            emptyList<Movie>()
+                        }
+                        .first()
                 }
 
-            // Load first page of movies for current genre
-            getMoviesPage(
-                genre = _state.value.selectedGenre,
-                from = 0
-            )
-                .catch { t ->
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        error = t.message ?: "Unknown error"
-                    )
-                }
-                .collect { movies ->
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        movies = movies,
-                        hasMore = movies.isNotEmpty()
-                    )
-                }
+                // Await both results
+                val (genres, movies) = awaitAll(genresDeferred, moviesDeferred)
+                
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    genres = genres as List<Genre>,
+                    movies = movies as List<Movie>,
+                    hasMore = movies.isNotEmpty()
+                )
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    error = e.message ?: "Unknown error"
+                )
+            }
         }
     }
 

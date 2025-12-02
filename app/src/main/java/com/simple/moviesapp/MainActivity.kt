@@ -10,11 +10,9 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.simple.moviesapp.ui.MoviesScreen
-import com.simple.moviesapp.ui.MoviesViewModel
+import com.simple.moviesapp.ui.screens.MoviesScreen
+import com.simple.moviesapp.ui.screens.MoviesViewModel
 import com.simple.moviesapp.ui.theme.MoviesAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
